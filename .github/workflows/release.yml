@@ -1,4 +1,3 @@
-# 👇 This is your updated release.yml
 name: Publish Python 🐍 distribution 📦 to PyPI
 
 on:
