@@ -4,10 +4,10 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'DataStruct_Kit/**'
-      - 'tests/**'
+      - '**/*.py'
       - 'pyproject.toml'
       - 'requirements-dev.txt'
+      - 'tests/**'
 
   pull_request:
     branches: [ "main" ]
@@ -48,8 +48,8 @@ jobs:
             --durations=10 \
             --verbose
 
-      - name: Upload test report (dummy step to fetch artifact action)
+      - name: Upload test report
         uses: actions/upload-artifact@v3
         with:
-          name: dummy
-          path: README.md
+          name: test-results
+          path: README.md 
