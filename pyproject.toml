@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "DataStruct_Kit"
-version = "0.1.0"  # Update this for each release
+version = "0.1.0"
 authors = [
     {name = "RANGDAL PAVANSAI", email = "pavansai.20066@gmail.com"},
 ]
 description = "Python package implementing essential data structures and algorithms"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -22,5 +22,24 @@ classifiers = [
 Homepage = "https://github.com/Pavansai20054/DataStruct_Kit"
 Documentation = "https://github.com/Pavansai20054/DataStruct_Kit#readme"
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = [
+    "tests*",
+    "examples*",
+    "docs*",
+    "benchmarks*"
+]
+
+[tool.setuptools.package-data]
+"*" = ["*.py", "*.txt", "*.json"]
+
+[tool.setuptools.exclude-package-data]
+"*" = [
+    "test*",
+    "example*",
+    "doc*",
+    "benchmark*",
+    "*.md",
+    "*.rst"
+]

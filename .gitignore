@@ -23,3 +23,7 @@ DataStruct_Kit.egg-info/
 # System files
 .DS_Store          # macOS
 Thumbs.db          # Windows
+
+build/
+dist/
+*.egg-info/
