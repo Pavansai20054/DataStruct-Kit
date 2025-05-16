@@ -1,3 +1,4 @@
+# 👇 This is your updated ci.yml
 name: Continuous Integration
 
 on:
@@ -8,15 +9,12 @@ on:
       - 'code/DataStruct_Kit/tests/**'
       - 'code/DataStruct_Kit/pyproject.toml'
       - 'code/DataStruct_Kit/requirements-dev.txt'
-    # Remove paths-ignore here; not allowed with paths
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+      - 'examples/**'
   pull_request:
     branches: [ "main" ]
-    paths:
-      - 'code/DataStruct_Kit/**'
-      - 'code/DataStruct_Kit/tests/**'
-      - 'code/DataStruct_Kit/pyproject.toml'
-      - 'code/DataStruct_Kit/requirements-dev.txt'
-    # Remove paths-ignore here; not allowed with paths
 
 jobs:
   test:
@@ -42,7 +40,7 @@ jobs:
         working-directory: code/DataStruct_Kit
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[test]
+          pip install -e .
           pip install -r requirements-dev.txt
           pip install pytest pytest-cov
 
@@ -55,3 +53,9 @@ jobs:
             --cov-fail-under=80 \
             --durations=10 \
             --verbose
+
+      - name: Upload test report (dummy step to fetch artifact action)
+        uses: actions/upload-artifact@v3
+        with:
+          name: dummy
+          path: README.md

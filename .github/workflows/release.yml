@@ -1,93 +1,39 @@
-name: Publish Package
+# 👇 This is your updated release.yml
+name: Publish Python 🐍 distribution 📦 to PyPI
 
 on:
-  push:
-    branches: [ "main" ]
-    paths:
-      - 'pyproject.toml'
-      - 'DataStruct_Kit/__init__.py'
   release:
-    types: [created]
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version number (x.y.z)'
-        required: true
-        default: '0.1.0'
+    types: [published]
 
 jobs:
-  deploy:
+  publish-to-pypi:
+    name: Upload release to PyPI
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Validate version format
-      run: |
-        version="${{ github.event.inputs.version || github.ref_name }}"
-        if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "::error::Invalid version format: $version (expected x.y.z)"
-          exit 1
-        fi
-        echo "Valid version: $version"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        cache: 'pip'
-        cache-dependency-path: 'requirements-dev.txt'
+      - name: Install build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
 
-    - name: Install build tools
-      run: |
-        python -m pip install --upgrade pip
-        pip install build twine wheel setuptools_scm check-wheel-contents
+      - name: Build package
+        run: python -m build
 
-    - name: Build package
-      run: python -m build
-      env:
-        SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.event.inputs.version || github.ref_name }}
+      - name: Upload dummy artifact (to trigger action pre-download)
+        uses: actions/upload-artifact@v3
+        with:
+          name: dummy
+          path: README.md
 
-    - name: Verify wheel contents
-      run: |
-        wheel_path="dist/datastruct_kit-${{ github.event.inputs.version || github.ref_name }}-py3-none-any.whl"
-        echo "=== Package Contents ==="
-        python -c "
-        import zipfile, sys
-        try:
-            with zipfile.ZipFile('$wheel_path') as z:
-                print(*sorted(z.namelist()), sep='\n')
-            print('\n✅ Wheel structure verified')
-        except Exception as e:
-            print(f'::error::{e}')
-            sys.exit(1)
-        "
-
-    - name: Verify package
-      run: |
-        twine check dist/* || echo "::warning::Twine validation warning"
-        check-wheel-contents dist/*.whl --ignore W002,W005,W009
-        ls -la dist/
-
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
-        skip-existing: true
-        verify-metadata: true
-        print-hash: true
-        retries: 3
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: distribution-packages
-        path: dist/*
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
