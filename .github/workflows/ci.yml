@@ -1,18 +1,15 @@
-# 👇 This is your updated ci.yml
 name: Continuous Integration
 
 on:
   push:
     branches: [ "main" ]
+    # ❗ Only paths included — paths-ignore removed to fix the error
     paths:
       - 'code/DataStruct_Kit/**'
       - 'code/DataStruct_Kit/tests/**'
       - 'code/DataStruct_Kit/pyproject.toml'
       - 'code/DataStruct_Kit/requirements-dev.txt'
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - 'examples/**'
+
   pull_request:
     branches: [ "main" ]
 
