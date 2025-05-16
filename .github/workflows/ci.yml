@@ -36,4 +36,4 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest tests/ --cov=DataStruct_Kit --cov-report=term --cov-fail-under=80 --durations=10
+        pytest tests/ --cov=DataStruct_Kit --cov-report=term --cov-fail-under=80 --durations=10 
