@@ -5,14 +5,30 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: fossas/license-checker-action@v2
         with:
-          strategy: all 
+          fetch-depth: 0
+
+      - name: Check licenses
+        uses: fossas/license-checker-action@v2
+        with:
+          strategy: all
           output: true
           fail_on: non-compliant
+          format: markdown
+          custom_accepted_licenses: 'MIT,Apache-2.0,BSD-3-Clause'
+
+      - name: Upload license report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: license-report
+          path: license-report.md
