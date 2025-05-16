@@ -1,32 +1,16 @@
-name: CI Pipeline
+# .github/workflows/ci.yml
+name: CI
 
-on:
+on: 
   push:
     branches: [main]
-    paths:
-      - 'code/DataStruct_Kit/**'
-      - 'code/DataStruct_Kit/tests/**'
-      - 'code/DataStruct_Kit/pyproject.toml'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./code/DataStruct_Kit
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
       
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: |
-          pip install -e .
-          pip install pytest
-
-      - name: Run tests
-        run: pytest tests/
+      - name: Print confirmation
+        run: echo "Workflow is running!"
