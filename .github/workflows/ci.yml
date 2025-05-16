@@ -1,32 +1,32 @@
-name: CI
+name: Continuous Integration
 
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
-      - '.github/**'
+    paths:
+      - '**.py'
+      - '!tests/**'
+      - '!examples/**'
   pull_request:
     branches: [ "main" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
-      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-
+    
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
-        cache-dependency-path: '**/requirements-dev.txt'
+        cache-dependency-path: 'requirements-dev.txt'
 
     - name: Install dependencies
       run: |
@@ -36,4 +36,9 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest tests/ --cov=DataStruct_Kit --cov-report=term --cov-fail-under=80 --durations=10 
+        pytest tests/ \
+          --cov=DataStruct_Kit \
+          --cov-report=term \
+          --cov-fail-under=80 \
+          --durations=10 \
+          --verbose

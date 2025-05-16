@@ -2,69 +2,62 @@ name: Publish Package
 
 on:
   release:
-    types: [published]
+    types: [created]
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (format: x.y.z)'
+        description: 'Version number (x.y.z)'
         required: true
+        default: '0.1.0'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       packages: write
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: '**/requirements-dev.txt'
+    - name: Validate version format
+      run: |
+        if [[ ! ${{ github.event.inputs.version || github.ref_name }} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "::error::Invalid version format"
+          exit 1
+        fi
 
-      - name: Install build tools
-        run: |
-          python -m pip install --upgrade pip build twine wheel
-          pip install setuptools_scm check-wheel-contents
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: 'requirements-dev.txt'
 
-      - name: Verify metadata
-        run: |
-          python -c "
-          from importlib.metadata import version
-          print(f'Building version: {version('DataStruct_Kit')}')
-          "
-          check-wheel-contents dist/*.whl
+    - name: Install build tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install build twine wheel setuptools_scm check-wheel-contents
 
-      - name: Build package
-        run: python -m build
-        env:
-          SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.event.inputs.version || github.ref_name }}
+    - name: Build package
+      run: python -m build
+      env:
+        SETUPTOOLS_SCM_PRETEND_VERSION: ${{ github.event.inputs.version || github.ref_name }}
 
-      - name: Verify distribution
-        run: |
-          twine check dist/*
-          ls -la dist/
-          check-wheel-contents dist/*.whl
+    - name: Verify package
+      run: |
+        twine check dist/*
+        check-wheel-contents dist/*.whl
+        ls -la dist/
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          skip-existing: true
-          verbose: true
-          verify-metadata: true
-          print-hash: true
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: distribution-packages
-          path: dist/*
+    - name: Publish to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        skip-existing: true
+        verify-metadata: true
