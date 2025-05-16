@@ -1,7 +1,18 @@
 name: License Compliance
-on: [pull_request]
+
+on: 
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: fossas/license-checker-action@v2
+        with:
+          strategy: all 
+          output: true
+          fail_on: non-compliant
