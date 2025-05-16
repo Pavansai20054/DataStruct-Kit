@@ -1,0 +1,7 @@
+name: License Compliance
+on: [pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: fossas/license-checker-action@v2

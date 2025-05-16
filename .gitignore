@@ -1,0 +1,25 @@
+# Python compiled files and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment files
+.env               # Contains your PyPI token (critical to ignore!)
+
+# IDE/Editor files
+.vscode/           # Not in your tree but commonly ignored
+.idea/             # Not in your tree but commonly ignored
+
+# Build and distribution files
+DataStruct_Kit.egg-info/
+
+# Testing cache
+.pytest_cache/
+
+# Type checking cache
+.mypy_cache/
+
+# System files
+.DS_Store          # macOS
+Thumbs.db          # Windows

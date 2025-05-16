@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "DataStruct_Kit"
+version = "0.1.0"  # Update this for each release
+authors = [
+    {name = "RANGDAL PAVANSAI", email = "pavansai.20066@gmail.com"},
+]
+description = "Python package implementing essential data structures and algorithms"
+readme = "README.md"
+requires-python = ">=3.7"
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/Pavansai20054/DataStruct_Kit"
+Documentation = "https://github.com/Pavansai20054/DataStruct_Kit#readme"
+
+[tool.setuptools.packages]
+find = {}
