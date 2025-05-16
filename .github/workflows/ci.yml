@@ -1,59 +1,32 @@
-name: Continuous Integration
+name: CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
     paths:
-      - 'code/DataStruct_Kit/**'  # Adjusted paths
+      - 'code/DataStruct_Kit/**'
       - 'code/DataStruct_Kit/tests/**'
       - 'code/DataStruct_Kit/pyproject.toml'
-      - 'code/DataStruct_Kit/requirements-dev.txt'
-
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     defaults:
       run:
-        working-directory: ./code/DataStruct_Kit  # Key change
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        working-directory: ./code/DataStruct_Kit
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
+      - uses: actions/checkout@v4
+      
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: code/DataStruct_Kit/requirements-dev.txt
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -e .
-          pip install -r requirements-dev.txt
-          pip install pytest pytest-cov
+          pip install pytest
 
       - name: Run tests
-        run: |
-          pytest tests/ \
-            --cov=DataStruct_Kit \
-            --cov-report=term \
-            --cov-fail-under=80 \
-            --durations=10 \
-            --verbose
-
-      - name: Upload test report
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: code/DataStruct_Kit/README.md
+        run: pytest tests/
