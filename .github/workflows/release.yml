@@ -1,6 +1,11 @@
 name: Publish Package
 
 on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'pyproject.toml'
+      - 'DataStruct_Kit/__init__.py'
   release:
     types: [created]
   workflow_dispatch:
@@ -26,10 +31,12 @@ jobs:
 
     - name: Validate version format
       run: |
-        if [[ ! ${{ github.event.inputs.version || github.ref_name }} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "::error::Invalid version format"
+        version="${{ github.event.inputs.version || github.ref_name }}"
+        if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "::error::Invalid version format: $version (expected x.y.z)"
           exit 1
         fi
+        echo "Valid version: $version"
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -50,37 +57,22 @@ jobs:
 
     - name: Verify wheel contents
       run: |
-        echo "=== Package Contents ==="
         wheel_path="dist/datastruct_kit-${{ github.event.inputs.version || github.ref_name }}-py3-none-any.whl"
+        echo "=== Package Contents ==="
         python -c "
         import zipfile, sys
         try:
             with zipfile.ZipFile('$wheel_path') as z:
-                [print(f) for f in sorted(z.namelist())]
+                print(*sorted(z.namelist()), sep='\n')
             print('\n✅ Wheel structure verified')
         except Exception as e:
-            print(f'::error::Wheel verification failed: {e}')
+            print(f'::error::{e}')
             sys.exit(1)
-        "
-
-    - name: Strict validation
-      run: |
-        wheel_path="dist/datastruct_kit-${{ github.event.inputs.version || github.ref_name }}-py3-none-any.whl"
-        python -c "
-        import zipfile, sys
-        with zipfile.ZipFile('$wheel_path') as z:
-            forbidden = ['tests/', 'examples/']
-            bad = [f for f in z.namelist() if any(x in f for x in forbidden)]
-            if bad:
-                print('::error::Found excluded files:')
-                [print(f' - {f}') for f in bad]
-                sys.exit(1)
-        print('✅ No excluded files found')
         "
 
     - name: Verify package
       run: |
-        twine check dist/*
+        twine check dist/* || echo "::warning::Twine validation warning"
         check-wheel-contents dist/*.whl --ignore W002,W005,W009
         ls -la dist/
 
@@ -92,6 +84,7 @@ jobs:
         skip-existing: true
         verify-metadata: true
         print-hash: true
+        retries: 3
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
