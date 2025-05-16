@@ -5,9 +5,6 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
 
 jobs:
   check:
@@ -15,26 +12,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required for license checking
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # License checker requires Node.js
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Run License Checker
-        uses: fossas/license-checker-action@v3.0.0  # Updated to latest stable version
-        with:
-          strategy: all
-          output: true
-          fail_on: non-compliant
-          format: markdown
-          custom_accepted_licenses: 'MIT,Apache-2.0,BSD-3-Clause'
-          github_token: ${{ github.token }}  # Required for authentication
+      - name: Install license-checker
+        run: npm install -g license-checker
 
-      - name: Upload license report
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: license-report
-          path: license-report.md
+      - name: Run license check
+        run: |
+          license-checker \
+            --production \
+            --onlyAllow "MIT;Apache-2.0;BSD-3-Clause" \
+            --excludePrivatePackages \
+            --failOn "non-compliant"
