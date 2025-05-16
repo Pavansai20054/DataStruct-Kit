@@ -4,11 +4,10 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'DataStruct_Kit/**'
-      - 'tests/**'
-      - 'pyproject.toml'
-      - 'requirements-dev.txt'
-      - 'README.md'
+      - 'code/DataStruct_Kit/**'  # Adjusted paths
+      - 'code/DataStruct_Kit/tests/**'
+      - 'code/DataStruct_Kit/pyproject.toml'
+      - 'code/DataStruct_Kit/requirements-dev.txt'
 
   pull_request:
     branches: [ "main" ]
@@ -17,6 +16,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ./code/DataStruct_Kit  # Key change
+
     strategy:
       fail-fast: false
       matrix:
@@ -31,9 +34,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: |
-            requirements-dev.txt
-            pyproject.toml
+          cache-dependency-path: code/DataStruct_Kit/requirements-dev.txt
 
       - name: Install dependencies
         run: |
@@ -51,11 +52,8 @@ jobs:
             --durations=10 \
             --verbose
 
-      - name: Upload coverage report
+      - name: Upload test report
         uses: actions/upload-artifact@v3
-        if: always()
         with:
-          name: coverage-report
-          path: |
-            .coverage
-            htmlcov/
+          name: test-results
+          path: code/DataStruct_Kit/README.md
