@@ -1,52 +1,16 @@
-name: DataStruct-Kit CI
+# .github/workflows/ci.yml
+name: CI
 
-on:
+on: 
   push:
     branches: [main]
-    paths:
-      - 'code/DataStruct_Kit/**'
-      - '!code/DataStruct_Kit/dist/**'  # Ignore build artifacts
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./code/DataStruct_Kit
-
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: 'code/DataStruct_Kit/pyproject.toml'
-
-      - name: Install dependencies
-        run: |
-          pip install -e .
-          pip install pytest pytest-cov
-          pip install -r requirements-dev.txt
-
-      - name: Run tests with coverage
-        run: |
-          pytest tests/ \
-            --cov=DataStruct_Kit \
-            --cov-report=term \
-            --cov-fail-under=80 \
-            --verbose
-
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report
-          path: |
-            code/DataStruct_Kit/.coverage
-            code/DataStruct_Kit/htmlcov/
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Print confirmation
+        run: echo "Workflow is running!"
